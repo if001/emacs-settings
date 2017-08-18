@@ -1,0 +1,306 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  -*- coding: utf-8-unix -*-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 環境変数 EMACS_IME と異なる IME を使いたい場合は、
+;; 以下を有効にして設定することができます。
+;; (setq emacs-ime "atokx3");; anthy-el atokx3 ibus-el mozc tamago scim scim-bridge skk wnn7egg
+
+;; マクロサーチパスの追加
+;; 例えば、~/.emacs.d/local 以下にユーザ用の *.el, *.elc を置けます。
+;; (add-to-list 'load-path "~/.emacs.d/local")
+;; (add-to-list 'load-path "~/lib/emacs")
+;; (add-to-list 'load-path "~/.emacs.d/auto-install")
+
+
+;;-------------------------------------------------------------------------;;
+;; load-pathの追加関数
+(defun add-to-load-path (&rest paths)
+  (let (path)
+    (dolist (path paths paths)
+      (let ((default-directory (expand-file-name (concat user-emacs-directory path))))
+        (add-to-list 'load-path default-directory)
+        (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
+            (normal-top-level-add-subdirs-to-load-path))))))
+
+;; load-pathに追加するフォルダ
+;; 2つ以上フォルダを指定する場合の引数 => (add-to-load-path "elisp" "xxx" "xxx")
+(add-to-load-path "elisp")
+
+;;-------------------------------------------------------------------------;;
+
+;;時計の表示
+(display-time-mode 1)
+
+;;;スタートメッセージを表示しない
+(setq inhibit-startup-message t)
+
+;; tool bar を消す.
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
+
+;; 対応する括弧を光らせる。
+(show-paren-mode 1)
+
+;;背景透過
+(set-frame-parameter nil 'alpha 85)
+
+
+;;起動時のフレームサイズを設定する
+(setq initial-frame-alist
+      (append (list
+	'(width . 90)
+        '(height . 40)
+        )
+       initial-frame-alist))
+(setq default-frame-alist initial-frame-alist)
+
+(custom-set-variables
+ '(blink-cursor-mode nil);;カーソルの点滅をやめる
+ '(inhibit-startup-screen t);;起動時にGNU Emacs を表示しない
+ '(show-paren-mode t));;対応するカッコを強調
+
+
+;
+;(setq make-backup-files nil)
+;
+;(setq auto-save-default nil)
+
+
+;;-------------------------------------------------------------------------;;
+
+
+
+
+
+;;-------------------------------------------------------------------------;;
+;;anything
+(require 'anything-startup)
+
+;;filelistへのパス
+(setq anything-c-filelist-file-name "/home/issei/.emacs.d/anything.filelist")
+(setq anything-grep-candidates-fast-directory-regexp "/home/issei/.emacs.d/anything.filelist")
+
+;;C-c C-fでanything-filelist+
+(define-key global-map [(C c) (f)] 'anything-filelist+)
+
+;;M-yでanything-show-kill-ring
+(define-key global-map [(M y)] 'anything-show-kill-ring)
+;;-------------------------------------------------------------------------;;
+;elispe
+;互換性確保
+(require 'auto-install)
+(setq auto-install-directory "~/.emacs.d/elisp/")
+(auto-install-update-emacswiki-package-name t)
+(auto-install-compatibility-setup)
+;;-------------------------------------------------------------------------;;
+
+
+;;-------------------------------------------------------------------------;;
+;;フォント設定
+(set-face-attribute `default nil
+		    :family "RictyDiminished-Regular"
+		    :height 80)
+;;-------------------------------------------------------------------------;;
+
+
+
+
+;;-------------------------------------------------------------------------;;
+(require 'tabbar)
+(tabbar-mode 1)
+(global-set-key "\M-]" 'tabbar-forward)  ; 次のタブ
+(global-set-key "\M-[" 'tabbar-backward) ; 前のタブ
+;; タブ上でマウスホイールを使わない
+(tabbar-mwheel-mode nil)
+;; グループを使わない
+(setq tabbar-buffer-groups-function nil)
+;; 左側のボタンを消す
+(dolist (btn '(tabbar-buffer-home-button
+               tabbar-scroll-left-button
+               tabbar-scroll-right-button))
+  (set btn (cons (cons "" nil)
+                 (cons "" nil))))
+;; 色設定
+(set-face-attribute ; バー自体の色
+  'tabbar-default nil
+   :background "SkyBlue"
+   :family "PL ゴシック"
+   :height 1.0)
+(set-face-attribute ; アクティブなタブ
+  'tabbar-selected nil
+   :background "indian red"
+   :foreground "white"
+   :weight 'bold
+   :box nil)
+(set-face-attribute ; 非アクティブなタブ
+  'tabbar-unselected nil
+   :background "grey30"
+   :foreground "white"
+   :family "PL ゴシック"
+   :box nil)
+
+
+(defun my-tabbar-buffer-list ()
+  (delq nil
+        (mapcar #'(lambda (b)
+
+                    (cond
+                     ;; Always include the current buffer.
+                     ((eq (current-buffer) b) b)
+                     ((buffer-file-name b) b)
+                     ((char-equal ?\  (aref (buffer-name b) 0)) nil)
+		     ((equal "*scratch*" (buffer-name b)) b) ; *scratch*バッファは表示する
+		     ((char-equal ?* (aref (buffer-name b) 0)) nil) ; それ以外の * で始まるバッファは表示しない
+                     ((buffer-live-p b) b)))
+                (buffer-list))))
+(setq tabbar-buffer-list-function 'my-tabbar-buffer-list)
+
+;;;---------------------------------------------------------------------;
+
+
+
+
+
+;;;-------------------------------------------------------------------------;;
+
+  ;; 文字の色を設定します。
+  (add-to-list 'default-frame-alist '(foreground-color . "white"))
+
+  ;; 背景色を設定します。
+  (add-to-list 'default-frame-alist '(background-color . "black"))
+
+  ;;コメントの色
+  (set-face-foreground 'font-lock-comment-face "steel blue")
+
+;; ;;-------------------------------------------------------------------------;;
+
+
+
+
+;; ;;-------------------------------------------------------------------------;;
+
+;; キーバインド
+(define-key global-map "\C-c;" 'comment-region)      ; コメントアウト
+(define-key global-map "\C-c:" 'uncomment-region)    ; コメント解除
+(define-key global-map "\C-z" 'undo)                 ; undo
+
+
+;;; 終了時にオートセーブファイルを消す
+(setq delete-auto-save-files t)
+
+;;; 画像ファイルを表示する
+(auto-image-file-mode t)
+
+;; ;;-------------------------------------------------------------------------;;
+
+
+
+;; ;;-------------------------------------------------------------------------;;
+;; ;twitering mode
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/elisp"))
+(require 'twittering-mode )
+ (setq twittering-allow-insecure-server-cert t)
+(setq twittering-icon-mode t)
+
+
+
+(setq twittering-account-authorization 'authorized)
+(setq twittering-oauth-access-token-alist
+      '(("oauth_token" . "214765325-3un04az3v8QxSWOfbh4PcZqWLjq3RK3W7og8Avs")
+	("oauth_token_secret" . "zG2xncCVNQ9TSE0jc5s5FUzGm78Xgd5zzrM3XiVsY")
+	("user_id" . "214765325")
+	("screen_name" . "gin___if")))
+
+
+;;自動更新の頻度（秒）
+;(setq twittering-timer-interval 60)
+
+;;表示する書式
+(setq twittering-status-format "%i @%s %S %p: \n %T \n [%@]%r %R %f \n \n------------------------------------")
+
+; 非公式RTする時の形式
+; 大体こんな感じになる
+; RT @mugijiru 渋谷隕石?
+(setq twittering-retweet-format "RT @%s %t")
+
+
+;; %iがアイコン
+;; %sがユーザー名
+;; %Sが名前
+;; %pが鍵の有無(鍵垢は[x]と表示される)
+;; \nで改行
+;; %Tはツイートの内容
+;; %@はつぶやいた時間
+;; %rはリプライならその相手のユーザー名
+;; %Rはリツイートならその相手のユーザー名
+;; %fはクライアント名
+
+(add-hook 'twittering-mode-init-hook 'twittering-enable-unread-status-notifier)
+
+(setq twittering-initial-timeline-spec-string
+      '(":home"
+        ":replies"))
+
+(add-hook 'twittering-new-tweets-hook
+	  (lambda ()
+	    (if (string=
+		 (twittering-timeline-spec-to-string 
+		  twittering-new-tweets-spec) 
+		 ":replies")
+		(start-process "twittering-notify-sound" nil "mplayer"
+			       "/usr/share/sounds/KDE-Im-User-Auth.ogg"))
+	    (define-key twittering-mode-map (kbd "R") 'twittering-native-retweet)
+))
+
+; mode-line に API の残数を表示する
+(setq twittering-display-remaining t)
+
+;;-------------------------------------------------------------------------;;
+;; Show tab, zenkaku-space, white spaces at end of line
+;; http://www.bookshelf.jp/soft/meadow_26.html#SEC317
+;; (defface my-face-tab         '((t (:background "Yellow"))) nil :group 'my-faces)
+(defface my-face-zenkaku-spc '((t (:background "LightBlue"))) nil :group 'my-faces)
+(defface my-face-spc-at-eol  '((t (:foreground "Red" :underline t))) nil :group 'my-faces)
+(defvar my-face-tab         'my-face-tab)
+(defvar my-face-zenkaku-spc 'my-face-zenkaku-spc)
+(defvar my-face-spc-at-eol  'my-face-spc-at-eol)
+(defadvice font-lock-mode (before my-font-lock-mode ())
+  (font-lock-add-keywords
+   major-mode
+   '(("\t" 0 my-face-tab append)
+     ("　" 0 my-face-zenkaku-spc append)
+     ("[ \t]+$" 0 my-face-spc-at-eol append)
+     )))
+(ad-enable-advice 'font-lock-mode 'before 'my-font-lock-mode)
+(ad-activate 'font-lock-mode)
+;; settings for text file
+(add-hook 'text-mode-hook
+          '(lambda ()
+             (progn
+               (font-lock-mode t)
+               (font-lock-fontify-buffer))))
+
+;; ;;-------------------------------------------------------------------------;;
+
+
+
+;; ;;-------------------------------------------------------------------------;;
+;; ;php-mode
+;; ;; (load-library "/home/issei/.emacs/php-mode")
+;; (require 'php-mode)
+
+
+;; ;; mmm-mode in php
+;; (require 'mmm-mode)
+;; (setq mmm-global-mode 'maybe)
+;; (mmm-add-mode-ext-class nil "\\.php?\\'" 'html-php)
+;; (mmm-add-classes
+;;  '((html-php
+;;     :submode php-mode
+;;     :front "<\\?\\(php\\)?"
+;;     :back "\\?>")))
+;; (add-to-list 'auto-mode-alist '("\\.php?\\'" . xml-mode))
+;; ;;-------------------------------------------------------------------------;;

@@ -1,0 +1,85 @@
+ls
+ls
+cd eshell/
+ls
+cd ..
+ls
+cd myconf/
+ls
+ls
+cd 
+ls
+cd Dropbox/
+ls
+cd prog_lab/
+ls
+cd ..
+ls
+ls
+cd curi_prog/
+ls
+cd curi_cython8-3/
+ls
+cd main/
+ls
+em fuzzy_art_re.py
+emacs fuzzy_art_re.py
+ls
+cd Dropbox/
+ls
+cd prog_lab/
+cd ..
+cd prog
+ls
+cd python/
+ls
+cd learning3/
+ls
+ls
+ls
+cd
+ls
+ls
+ls
+ls
+cd Dropbox/
+cd prog_lab/
+cd ..
+ls
+ls
+cd Dr
+ls
+cd curi_prog/
+ls
+cd curi_cython8-3/
+ls
+cd main/
+ls
+l
+ls
+ping localhost
+l
+ls
+ssh localhost
+ls
+l
+ls
+ls
+cd ..
+cd 
+ls
+pwd
+ls
+ls
+l
+ll
+ll
+ls -l
+ls
+cd ..
+ls
+pwd
+ssh 
+(with-current-buffer "output" (buffer-string))
+ls
+python3 agent.py 
